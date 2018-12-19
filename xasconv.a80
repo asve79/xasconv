@@ -1,0 +1,463 @@
+	module xasconv
+
+	include "cnvexe.a80"
+
+PROG
+	LD	HL,5B00H
+	LD	BC,2800H
+	CALL	dmm.IDMM
+
+	LD	HL,WRK_WIND
+	CALL	wind.PRINTW
+	CALL	wind.ENDW
+
+	LD	HL,MM_WIND
+	CALL	wind.PRINTW
+	LD	HL,QM0
+	CALL	INIAB
+QM0	LD	IX,MM_MENU
+	CALL	wind.IMENU
+	CALL	wind.RMENU
+	JR	NZ,QM0
+	CP	13
+	JR	NZ,QM0
+	CALL	wind.ENDW
+	RET
+
+XATXT_EXE
+	CALL	SEL_FILE
+	LD	A,(ARG_DIRENT+13)
+	CP	65	;Too long *.XAS
+	LD	A,4
+	JP	NC,trfil.FAT_ERR
+
+	LD	HL,ARG_DIRENT
+	LD	DE,OUT_NAME+1
+	LD	BC,8
+	LDIR
+	
+	LD	HL,PRM_WIND
+	CALL	wind.PRINTW
+	LD	HL,PRM_MSG1
+	CALL	wind.PRINTS
+	LD	HL,ARG_DIRENT
+	CALL	FLGS0
+CXT0	LD	IX,PARAM_MNU
+	CALL	wind.IMENU
+	CALL	wind.RMENU
+	JR	NZ,CXT0
+	CP	13
+	JR	NZ,CXT0
+	JP	wind.ENDW
+
+OUTFILE_EXE
+	LD	DE,020CH
+	CALL	wind.GOTODE
+	LD	HL,OUT_NAME
+	CALL	wind.INP_STR
+	LD	HL,OUT_NAME+9
+	LD	(HL),' '
+	INC	HL
+	LD	A,(HL)
+	LD	(HL),'.'
+	INC	HL
+	CP	'.'
+	LD	A,(HL)
+	JR	Z,OFLE0
+	LD	A,'C'
+OFLE0:	LD	(HL),A
+	XOR	A
+	RET
+
+XATXT_DOIT:
+	LD	HL,OUT_NAME+1
+	LD	DE,RSL_DIRENT
+	LD	BC,8
+	LDIR
+	INC	HL
+	INC	HL
+	LDI
+
+	LD	A,50H
+	OUT	(0FDH),A
+	LD	HL,0C000H
+	LD	(HL),A
+	INC	A
+	OUT	(0FDH),A
+	LD	(HL),A
+	DEC	A
+	OUT	(0FDH),A
+	CP	(HL)
+	JP	NZ,ERR_128K
+
+	LD	DE,ARG_DIRENT
+	CALL	trfil.LD_FIL
+	LD	HL,CNV_WIND
+	CALL	wind.PRINTW
+	LD	HL,CNV_MSG
+	CALL	wind.PRINTS
+	CALL	cnvexe.CNVXAS
+;Saving output file
+	LD	A,L
+	CP	1
+	CCF
+	ADC	A,H
+	SUB	L
+	LD	(RSL_DIRENT+13),A
+	LD	(RSL_DIRENT+11),HL
+	LD	HL,0
+	LD	(RSL_DIRENT+9),HL
+	LD	DE,RSL_DIRENT
+	CALL	trfil.SV_FIL
+	CALL	wind.ENDW
+	LD	A,13
+	RET
+
+DRIVE_EXE:
+	LD	A,(SY_DRV)
+	INC	A
+	XOR	1
+	DEC	A
+	LD	(SY_DRV),A
+	RET
+
+TXTXA_EXE:
+	LD	HL,SORRY_WND
+	CALL	wind.PRINTW
+	LD	HL,SORRY_MSG
+TXAEX0:	CALL	wind.PRINTS
+	CALL	wind.SOUND2
+	CALL	CURCON
+	JP	wind.ENDW
+
+ERR_128K:
+	LD	HL,SORRY_WND
+	CALL	wind.PRINTW
+	LD	HL,MSG_128K
+	JR	TXAEX0
+
+INFO_EXE:
+	LD	HL,INFO_WND
+	CALL	wind.PRINTW
+	LD	HL,INFO_MSG
+	CALL	wind.PRINTS
+	CALL	CURCON
+	JP	wind.ENDW
+
+CURCON:	CALL	wind.CUR_ON
+	CALL	spkeyb.CONIN
+	JP	wind.CUR_OFF
+
+P_R13:	LD	A,13
+	RET
+
+SEL_FILE:
+	CALL	trfil.RD_CAT
+	LD	HL,FILE_WND
+	CALL	wind.PRINTW
+	LD	DE,MSK_COD
+	CALL	trfil.SCAN_D
+	LD	A,(trfil.CAT_ADR+900H)
+	OR	A
+	JR	Z,SLF_END
+	LD	IX,FILE_COL
+	LD	(IX+4),A
+	CALL	wind.ILISTB
+	CALL	wind.RLISTB
+SLF_END:
+	LD	C,(IX+5)
+	CALL	FILE_GETADR
+	LD	DE,ARG_DIRENT
+	LD	BC,16
+	LDIR
+	CALL	wind.ENDW
+	RET
+
+ARG_DIRENT:
+	DS 16
+RSL_DIRENT:
+	DS 16
+OUT_NAME:
+	DB 11,'FileName .T',0
+
+FILE_GETSTR:
+	CALL	FILE_GETADR
+FLGS0:	LD	B,8
+	CALL	wind.OUTNS
+	LD	A,' '
+	CALL	wind.PRINTC
+	LD	A,'.'
+	CALL	wind.PRINTC
+	LD	A,(HL)
+	JP	wind.PRINTC
+
+FILE_GETADR:
+	LD	HL,trfil.CAT_ADR+901H
+	LD	B,0
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	L,A
+	LD	H,0
+	ADD	HL,HL
+	ADD	HL,HL
+	ADD	HL,HL
+	ADD	HL,HL
+	LD	BC,trfil.CAT_ADR
+	ADD	HL,BC
+	RET
+
+MSK_COD:
+	db 'msk_cod'
+
+;<HL=Ptr Adr
+;<BC=Block Size
+;>(Ptr Adr),HL=Block adr
+MALLOC_M:
+	LD	A,(HL)
+	INC	HL
+	OR	(HL)
+	RET	NZ
+	DEC	HL
+	PUSH	HL
+	CALL	dmm.MALLOC
+	EX	DE,HL
+	POP	HL
+	LD	(HL),E
+	INC	HL
+	LD	(HL),D
+	EX	DE,HL
+	RET
+
+;<HL=Ptr Adr
+;<(Ptr Adr)=Block Adr
+;>(Ptr Adr)=0
+DISPOSE_M:
+	LD	E,(HL)
+	INC	HL
+	LD	D,(HL)
+	DEC	HL
+	LD	A,D
+	OR	E
+	RET	Z
+	PUSH	HL
+	EX	DE,HL
+	CALL	dmm.DISPOS
+	POP	HL
+	XOR	A
+	LD	(HL),A
+	INC	HL
+	LD	(HL),A	
+	RET
+
+PAGE:	PUSH	BC
+	LD	BC,7FFDH
+	OUT	(C),A
+	POP	BC
+	RET
+
+ABORT:	LD	SP,(ABORT_SP)
+	CALL	wind.ABWIND
+	CALL	CLMEM_AB
+AB_ADR:	JP	0
+
+ABORT_SP:
+	DW	0
+
+INIAB:	LD	(AB_ADR+1),HL
+	LD	HL,0
+	ADD	HL,SP
+	INC	HL
+	INC	HL
+	LD	(ABORT_SP),HL
+	JP	wind.IAWIND
+
+CLMEM_AB:
+	RET
+
+WRK_WIND:
+	DB 0,0
+	DB 32,24
+	DB 00001111B
+	DB 00000011B
+	DB 0,0
+	DB 0
+	DB 1,'XAS-TEXT Convertor V1.01 (LSY)',0
+
+MM_WIND:
+	DB 2,2
+	DB 15,9
+	DB 00100000B
+	DB 00000101B
+	DB 0,0
+	DB 0
+	DB 1,'Main Menu',0
+
+MM_IT0:	DB 'Convert XAS -> TXT',0
+MM_IT1:	DB 'Convert TXT -> XAS',0
+MM_IT2:	DB 'Disk Drive: '
+SY_DRV:	DB 'A'
+	DB 0
+MM_IT3:	DB 'Information',0
+MM_IT4: DB 'Quit',0
+
+MM_MENU:
+	DB 0
+
+	DB 0,1,13,20H
+	DW MM_IT0
+	DW 0
+	DW 4
+	DW 4
+	DW 1
+	DW XATXT_EXE
+
+	DB 0,2,13,20H
+	DW MM_IT1
+	DW 0
+	DW 4
+	DW 0
+	DW 2
+	DW TXTXA_EXE
+
+	DB 0,3,13,20H
+	DW MM_IT2
+	DW 0
+	DW 4
+	DW 1
+	DW 3
+	DW DRIVE_EXE
+
+	DB 0,5,13,20H
+	DW MM_IT3
+	DW 0
+	DW 4
+	DW 2
+	DW 4
+	DW INFO_EXE
+
+	DB 0,6,13,20H
+	DW MM_IT4
+	DW 0
+	DW 4
+	DW 3
+	DW 0
+	DW P_R13
+
+	DB 0FFH
+
+FILE_WND:
+	DB 5,2
+	DB 12,20
+	DB 00110000B
+	DB 00000101B
+	DB 0,0
+	DB 0
+	DB 1,'Select File',0
+
+FILE_COL:
+	DB 0,1,10,17
+	DB 0
+	DB 0
+	DB 0
+	DB 0
+	DW FILE_GETSTR
+	DB 00110001B
+
+PRM_WIND:
+	DB 5,7
+	DB 20,7
+	DB 00011111B
+	DB 00000101B
+	DB 0,0
+	DB 0
+	DB 1,'Parameters',0
+
+PRM_MSG1:
+	DB 13,'Input file :',0
+
+PM_IT0:	db 'Output file:',5
+	DW OUT_NAME+1
+	DB 0
+
+PM_IT1:	DB 'Convert',0
+PM_IT2:	DB 'Cancel',0
+
+PARAM_MNU:
+	DB 0
+
+	DB 0,2,18,1FH
+	DW PM_IT0
+	DW 0
+	DW 0
+	DW 1
+	DW 1
+	DW OUTFILE_EXE
+
+	DB 1,4,6,1EH
+	DW PM_IT1
+	DW 2
+	DW 2
+	DW 0
+	DW 0
+	DW XATXT_DOIT
+
+	DB 11,4,5,1EH
+	DW PM_IT2
+	DW 1
+	DW 1
+	DW 0
+	DW 0
+	DW P_R13
+
+	DB 0FFH
+
+CNV_WIND:
+	DB 6,12
+	DB 18,6
+	DB 00101000B
+	DB 00000101B
+	DB 0,0
+	DB 0
+	DB 1,'Converting',0
+
+CNV_MSG:
+	DB 13,'Lines processed:'
+	DB 13,'Output size    :',0
+
+SORRY_WND:
+	DB 4,7
+	DB 22,8
+	DB 01010110B
+	DB 00000101B
+	DB 0,0
+	DB 0
+	DB 1,'Sorry windows',0
+
+INFO_WND:
+	DB 1,2
+	DB 29,18
+	DB 00110010B
+	DB 00000101B
+	DB 0,0
+	DB 0
+	DB 1,'Info window',0
+
+SORRY_MSG:
+	db 13,1,'Sorry',13
+	db 13
+        db 'This function is',13
+        db 'not implemented!',13
+        db 0
+
+MSG_128K:
+	db 13,1,'Neet 128k !',13, 0
+
+INFO_MSG:
+	db 1,'XAS-TEXT Convertor 128K',13
+	db 1,'Designed and programmed by',13
+	db 1,'Michael Borisov',13
+	db 1,'Dnepropetrovsk, Sep. 1996.',13
+	db 0
+
+
+	endmodule
