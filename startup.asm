@@ -74,7 +74,7 @@ SYSERR:
 	HALT
 
 	include "trfil.a80"
-	include "spkeyb.a80"
+	include "spkeyb40.a80"
         include "wind.a80"
         include "xasconv.a80"
 	include "dmm.a80"
