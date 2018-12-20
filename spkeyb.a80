@@ -100,11 +100,11 @@ INTKEY:	LD	E,0FFH	;FLAG
 	AND	00100010B ;D1=CTRL,D5=R/A
 	OR	H	  ;Shifts: S0R000CA
 	LD	(KEYSHT),A
-;────────────────────────────────
-; Это ∙ для устранения приколов с ВШ
+;тФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФА
+; ╨н╤В╨╛ тИЩ ╨┤╨╗╤П ╤Г╤Б╤В╤А╨░╨╜╨╡╨╜╨╕╤П ╨┐╤А╨╕╨║╨╛╨╗╨╛╨▓ ╤Б ╨Т╨и
 	XOR	A
 	IN	A,(254)
-;────────────────────────────────
+;тФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФАтФА
 
 	LD	H,7
 	LD	A,L
@@ -165,14 +165,14 @@ INK_07:	LD	A,L
 	JR	NZ,INK_08
 	EX	DE,HL
 	BIT	7,(HL)
-	RET	Z		;Ожидание освобождения KSTATE0 или KSTATE4
+	RET	Z		;╨Ю╨╢╨╕╨┤╨░╨╜╨╕╨╡ ╨╛╤Б╨▓╨╛╨▒╨╛╨╢╨┤╨╡╨╜╨╕╤П KSTATE0 ╨╕╨╗╨╕ KSTATE4
 
 INK_08:	LD	(STACK),SP
 	LD	(HL),A
 	INC	HL
 	LD	(HL),KDREBE
 	INC	HL
-	LD	(HL),REPDEL	;Задержка до первого повтора
+	LD	(HL),REPDEL	;╨Ч╨░╨┤╨╡╤А╨╢╨║╨░ ╨┤╨╛ ╨┐╨╡╤А╨▓╨╛╨│╨╛ ╨┐╨╛╨▓╤В╨╛╤А╨░
 	INC	HL
 	PUSH	HL
 	CALL	DECODE	;OBTAIN CODES 00 .. FF
@@ -213,7 +213,7 @@ INK_09:	INC	HL
 	RET	NZ
 	DEC	(HL)	;Auto-repeat delay
 	RET	NZ
-	LD	(HL),REPPER ;Задержка между повторами
+	LD	(HL),REPPER ;╨Ч╨░╨┤╨╡╤А╨╢╨║╨░ ╨╝╨╡╨╢╨┤╤Г ╨┐╨╛╨▓╤В╨╛╤А╨░╨╝╨╕
 	INC	HL
 	LD	A,(HL)	;Fetch result code
 	JR	INK_10
@@ -262,7 +262,7 @@ LT_ALT:	LD	D,0
 	LD	A,(HL)
 	RET
 
-;CTRL+NUMBERS,SPACE,ENTER,CAPS,РУС,TAB
+;CTRL+NUMBERS,SPACE,ENTER,CAPS,╨а╨г╨б,TAB
 CTRLNM:	LD	A,C
 	CP	11
 	JR	C,INS_C
@@ -306,10 +306,10 @@ DECODE:	LD	HL,KEYMOD
 	BIT	5,A ;LETTERS A-Z
 	JP	NZ,DECO_1
 
-	BIT	4,A ;Орелевские дополн. клавиши
+	BIT	4,A ;╨Ю╤А╨╡╨╗╨╡╨▓╤Б╨║╨╕╨╡ ╨┤╨╛╨┐╨╛╨╗╨╜. ╨║╨╗╨░╨▓╨╕╤И╨╕
 	JP	NZ,DECO_7
 
-; Остались цифры, SPACE, ENTER, TAB, CAPS, РУС
+; ╨Ю╤Б╤В╨░╨╗╨╕╤Б╤М ╤Ж╨╕╤Д╤А╤Л, SPACE, ENTER, TAB, CAPS, ╨а╨г╨б
 	LD	C,A
 	LD	A,(KEYSHT)
 	RLCA
@@ -375,7 +375,7 @@ DECO_2:	LD	A,(KEYMOD)
 	LD	A,E
 	RLA
 	LD	C,A
-	BIT	2,D	;Рамочные символы
+	BIT	2,D	;╨а╨░╨╝╨╛╤З╨╜╤Л╨╡ ╤Б╨╕╨╝╨▓╨╛╨╗╤Л
 	LD	HL,TBL_G
 	JR	NZ,DECO_4
 	CALL	ST_RUS
@@ -398,7 +398,7 @@ DEC_61:	LD	D,0
 	BIT	0,C
 	RET	NZ
 	INC	A
-	CP	'ё'
+	CP	0F1h
 	RET	Z
 	ADD	A,20H-1 ;"DEC A"
 	CP	0B0H	;a RUS
@@ -498,10 +498,10 @@ TBL_KC:	DEFB	33,39,56,06	;BHY6
 	DEFB	10,11,47,00 ;SP,EN,P0
 	DEFB	01,48,32	;1QA
 ; Additional keys
-	DEFB	00,18,16,23	; ;[- ║  ЖХ-
-	DEFB	25,20,26,13	;`,\R ║ `Б\R
-	DEFB	12,19,17,24	;C']= ║ CЭЪ=
-	DEFB	14,21,22	;T./  ║ TЮЁ
+	DEFB	00,18,16,23	; ;[- тХС  ╨Ц╨е-
+	DEFB	25,20,26,13	;`,\R тХС `╨С\R
+	DEFB	12,19,17,24	;C']= тХС C╨н╨к=
+	DEFB	14,21,22	;T./  тХС T╨о╨Б
 
 ;	  	   XOR	     AND       OR
 TBL_CT:	DEFB	00000001B	;F0 CAPS LOCK
@@ -546,61 +546,61 @@ TBL_EM: DEFB	'[{'	;[
 	DEFB	'\|'	;\
 
 ; Russ. letters on ext. keys
-TBL_ER: DEFB	'ХЪЖЭБЮЁ'
+TBL_ER: DEFB	'╨е╨к╨Ц╨н╨С╨о╨Б'
 
-TBL_RU:	DEFB	'ФИСВУАПР'	;A-H
-	DEFB	'ШОЛДЬТЩЗ'	;I-P
-	DEFB	'ЙКЫЕГМЦЧ'	;Q-X
-	DEFB	'НЯ'		;Y-Z
+TBL_RU:	DEFB	'╨д╨Ш╨б╨Т╨г╨Р╨Я╨а'	;A-H
+	DEFB	'╨и╨Ю╨Ы╨Ф╨м╨в╨й╨Ч'	;I-P
+	DEFB	'╨Щ╨Ъ╨л╨Х╨У╨Ь╨ж╨з'	;Q-X
+	DEFB	'╨Э╨п'		;Y-Z
 
-TBL_G:	DEFB	'│║'	;A
-	DEFB	'╧╨'	;B
-	DEFB	'┘╝'	;C
-	DEFB	'┼╬'	;D
-	DEFB	'┬╦'	;E
-	DEFB	'┤╣'	;F
-	DEFB	'╞╟'	;G
-	DEFB	'╪╫'	;H
-	DEFB	'░░'	;I
-	DEFB	'╡╢'	;J
-	DEFB	'▌▐'	;K
-	DEFB	'▄▀'	;L
-	DEFB	'█ '	;M	SPACE=255
-	DEFB	'╛╜'	;N
-	DEFB	'▒▒'	;O
-	DEFB	'▓▓'	;P
-	DEFB	'─═'	;Q
-	DEFB	'┐╗'	;R
-	DEFB	'├╠'	;S
-	DEFB	'╒╓'	;T
-	DEFB	'╕╖'	;U
-	DEFB	'╘╙'	;V
-	DEFB	'┌╔'	;W
-	DEFB	'┴╩'	;X
-	DEFB	'╤╥'	;Y
-	DEFB	'└╚'	;Z
+TBL_G:	DEFB	'тФВтХС'	;A
+	DEFB	'тХзтХи'	;B
+	DEFB	'тФШтХЭ'	;C
+	DEFB	'тФ╝тХм'	;D
+	DEFB	'тФмтХж'	;E
+	DEFB	'тФдтХг'	;F
+	DEFB	'тХЮтХЯ'	;G
+	DEFB	'тХктХл'	;H
+	DEFB	'тЦСтЦС'	;I
+	DEFB	'тХбтХв'	;J
+	DEFB	'тЦМтЦР'	;K
+	DEFB	'тЦДтЦА'	;L
+	DEFB	'тЦИ┬а'	;M	SPACE=255
+	DEFB	'тХЫтХЬ'	;N
+	DEFB	'тЦТтЦТ'	;O
+	DEFB	'тЦУтЦУ'	;P
+	DEFB	'тФАтХР'	;Q
+	DEFB	'тФРтХЧ'	;R
+	DEFB	'тФЬтХа'	;S
+	DEFB	'тХТтХУ'	;T
+	DEFB	'тХХтХЦ'	;U
+	DEFB	'тХШтХЩ'	;V
+	DEFB	'тФМтХФ'	;W
+	DEFB	'тФ┤тХй'	;X
+	DEFB	'тХдтХе'	;Y
+	DEFB	'тФФтХЪ'	;Z
 
-TBL_CG:	DEFB	'·■'	;B
-	DEFB	'Є¤'	;D
-	DEFB	'°Ў'	;F
-	DEFB	'ў∙'	;H
-	DEFB	'■Ў'	;J
-	DEFB	'ЖЭ'	;L
-	DEFB	'ЮБ'	;N
-	DEFB	'ХЪ'	;P
-	DEFB	'√ї'	;R
-	DEFB	'ўЁ'	;T
-	DEFB	'¤№'	;V
-	DEFB	'Ї∙'	;X
-	DEFB	'°є'	;Z
+TBL_CG:	DEFB	'┬╖тЦа'	;B
+	DEFB	'╨Д┬д'	;D
+	DEFB	'┬░╨О'	;F
+	DEFB	'╤ЮтИЩ'	;H
+	DEFB	'тЦа╨О'	;J
+	DEFB	'╨Ц╨н'	;L
+	DEFB	'╨о╨С'	;N
+	DEFB	'╨е╨к'	;P
+	DEFB	'тИЪ╤Ч'	;R
+	DEFB	'╤Ю╨Б'	;T
+	DEFB	'┬дтДЦ'	;V
+	DEFB	'╨ЗтИЩ'	;X
+	DEFB	'┬░╤Ф'	;Z
 
 KSTATE:	DEFB	0FFH	;Pseudo CODE
-	DEFB	0	;Счетчик дребезга
-	DEFB	0	;REPPER счетчик
-	DEFB	0	;код с учетом MODE
+	DEFB	0	;╨б╤З╨╡╤В╤З╨╕╨║ ╨┤╤А╨╡╨▒╨╡╨╖╨│╨░
+	DEFB	0	;REPPER ╤Б╤З╨╡╤В╤З╨╕╨║
+	DEFB	0	;╨║╨╛╨┤ ╤Б ╤Г╤З╨╡╤В╨╛╨╝ MODE
 
-	DEFB	0FFH	;4 переменных
-	DEFB	0	;аналогичного назн.
+	DEFB	0FFH	;4 ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Л╤Е
+	DEFB	0	;╨░╨╜╨░╨╗╨╛╨│╨╕╤З╨╜╨╛╨│╨╛ ╨╜╨░╨╖╨╜.
 	DEFB	0
 	DEFB	0
 
@@ -617,7 +617,7 @@ REPSTP:	DEFB	0		;FF - STOP REPEART
 KEYMOD:	DEFB	00000000B	;KEEP THIS TWO VARS CLOSE TOGETHER
 KEYSHT:	DEFB	00000000B	;COPY OF SHIFT BYTE
 
-TMP_CO:	DEFB	0	;Временное значение кода при наборе
+TMP_CO:	DEFB	0	;╨Т╤А╨╡╨╝╨╡╨╜╨╜╨╛╨╡ ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ ╨║╨╛╨┤╨░ ╨┐╤А╨╕ ╨╜╨░╨▒╨╛╤А╨╡
 
 STACK:	DEFS	2
 
