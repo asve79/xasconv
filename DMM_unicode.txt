@@ -1,4 +1,4 @@
-﻿Dynamic Memory Manager V1.01
+Dynamic Memory Manager V1.01
 (c) Barmaley 1995
 
    Менеджер динамической памяти. Функ-

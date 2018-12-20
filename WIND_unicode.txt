@@ -1,4 +1,4 @@
-﻿ Barmaley Window Interface (BMW)
+ Barmaley Window Interface (BMW)
  Version 2 From 27 Jun 1996
 
 Для работы требуются REL-модули:
