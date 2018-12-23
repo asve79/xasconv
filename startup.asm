@@ -38,7 +38,7 @@ IVTDAT	EQU	0BFH
 	LD	DE,ISR
 	LD	BC,ISREND-ISR
 	LDIR	;Transfer the ISR to its location
-	LD	A,#BE ;(IVT+1) ;high byte
+	LD	A,high IVT ;#BE ;(IVT+1) ;high byte
 	LD	I,A
 	EI
 	CALL	xasconv.PROG
