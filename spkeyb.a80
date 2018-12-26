@@ -22,26 +22,27 @@ CST:	LD	HL,(ULBUF)
 	CPL
 	RET
 
-CONIN:	EI
-CONIN0:	CALL	CST
-	JR	Z,CONIN0
+CONIN	EI
+CONIN0	CALL	CST
+CONIN2	JR	Z,CONIN0
 	DI
 	LD	A,L
 	INC	A
 	CP	LENBUF-1
 	JR	NZ,CONIN1
 	XOR	A
-CONIN1:	LD	(ULBUF),A
+CONIN1	LD	(ULBUF),A
 	LD	DE,BUFKLA
 	LD	H,0
 	ADD	HL,DE
 	LD	A,(HL)
-CONINE	EI
+	EI
 	RET
 
 CONINW	EI
         CALL	CST
-	JR	Z,CONINE	;no wait key code in bufer
+	RET	Z	;no wait key code in bufer
+	JR	CONIN2
 
 ; Additional keys
 ;SHF-..	/-54	.-53	TAB-52	=-51	]-50	'-49	CPS-48
