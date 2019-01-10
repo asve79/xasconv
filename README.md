@@ -5,7 +5,7 @@
 
 Адаптирован под sjasmplus.
 
-Как использовать:
+Сборка:
 
 ```bash
 git clone git@github.com:asve79/xasconv.git
